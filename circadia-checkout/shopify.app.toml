@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "4589ccbc524631cf441dfafda68327e5"
+name = "Lightning Kite Checkout"
+handle = "lightning-kite-checkout"
+application_url = "https://mailed-substantially-zones-gi.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "quickstart-42d89e09.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://mailed-substantially-zones-gi.trycloudflare.com/auth/callback",
+  "https://mailed-substantially-zones-gi.trycloudflare.com/auth/shopify/callback",
+  "https://mailed-substantially-zones-gi.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
