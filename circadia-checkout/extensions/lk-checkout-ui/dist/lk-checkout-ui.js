@@ -1145,7 +1145,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect3(create, deps) {
+          function useEffect4(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1927,7 +1927,7 @@
           exports.useContext = useContext3;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect3;
+          exports.useEffect = useEffect4;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -2495,7 +2495,7 @@
           var HostPortal = 4;
           var HostComponent = 5;
           var HostText = 6;
-          var Fragment = 7;
+          var Fragment2 = 7;
           var Mode = 8;
           var ContextConsumer = 9;
           var ContextProvider = 10;
@@ -2635,7 +2635,7 @@
                 return "DehydratedFragment";
               case ForwardRef:
                 return getWrappedName$1(type, type.render, "ForwardRef");
-              case Fragment:
+              case Fragment2:
                 return "Fragment";
               case HostComponent:
                 return type;
@@ -7053,7 +7053,7 @@
               }
             }
             function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-              if (current2 === null || current2.tag !== Fragment) {
+              if (current2 === null || current2.tag !== Fragment2) {
                 var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
                 created.return = returnFiber;
                 return created;
@@ -7456,7 +7456,7 @@
                 if (child.key === key) {
                   var elementType = element.type;
                   if (elementType === REACT_FRAGMENT_TYPE) {
-                    if (child.tag === Fragment) {
+                    if (child.tag === Fragment2) {
                       deleteRemainingChildren(returnFiber, child.sibling);
                       var existing = useFiber(child, element.props.children);
                       existing.return = returnFiber;
@@ -11633,7 +11633,7 @@
                 var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
                 return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
               }
-              case Fragment:
+              case Fragment2:
                 return updateFragment(current2, workInProgress2, renderLanes2);
               case Mode:
                 return updateMode(current2, workInProgress2, renderLanes2);
@@ -12074,7 +12074,7 @@
               case SimpleMemoComponent:
               case FunctionComponent:
               case ForwardRef:
-              case Fragment:
+              case Fragment2:
               case Mode:
               case Profiler:
               case ContextConsumer:
@@ -16840,7 +16840,7 @@
             return fiber;
           }
           function createFiberFromFragment(elements, mode, lanes, key) {
-            var fiber = createFiber(Fragment, elements, key, mode);
+            var fiber = createFiber(Fragment2, elements, key, mode);
             fiber.lanes = lanes;
             return fiber;
           }
@@ -19121,8 +19121,8 @@
   // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/extension.mjs
   var extension = createExtensionRegistrationFunction();
 
-  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/TextField/TextField.mjs
-  var TextField = createRemoteComponent("TextField");
+  // node_modules/@shopify/ui-extensions/build/esm/surfaces/checkout/components/Banner/Banner.mjs
+  var Banner = createRemoteComponent("Banner");
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/render.mjs
   var import_react6 = __toESM(require_react(), 1);
@@ -19452,10 +19452,8 @@ ${errorInfo.componentStack}`);
     }
   };
 
-  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/TextField/TextField.mjs
-  var TextField2 = createRemoteReactComponent(TextField, {
-    fragmentProps: ["accessory"]
-  });
+  // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/components/Banner/Banner.mjs
+  var Banner2 = createRemoteReactComponent(Banner);
 
   // node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/api.mjs
   var import_react9 = __toESM(require_react(), 1);
@@ -19545,34 +19543,30 @@ ${errorInfo.componentStack}`);
     }
     return useSubscription(shippingAddress);
   }
-  function useApplyShippingAddressChange() {
-    const api = useApi();
-    if ("applyShippingAddressChange" in api) {
-      return api.applyShippingAddressChange;
-    }
-    throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
-  }
 
   // extensions/lk-checkout-ui/src/Checkout.tsx
   var import_react12 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
-  var Checkout_default = reactExtension(
-    "purchase.checkout.delivery-address.render-before",
-    () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(RequireInfoExtension, {})
-  );
+  var Checkout_default = reactExtension("purchase.checkout.block.render", () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(RequireInfoExtension, {}));
   function RequireInfoExtension() {
-    const changeShippingAddress = useApplyShippingAddressChange();
     const [validationError, setValidationError] = (0, import_react12.useState)("");
     const shippingAddress = useShippingAddress();
     const canBlockProgress = useExtensionCapability("block_progress");
     useBuyerJourneyIntercept(({ canBlockProgress: canBlockProgress2 }) => {
+      const errors = [];
       if (canBlockProgress2 && (!shippingAddress.company || shippingAddress.company.length === 0)) {
+        errors.push("Company name");
+      }
+      if (canBlockProgress2 && (!shippingAddress.phone || shippingAddress.phone.length === 0)) {
+        errors.push("Phone Number");
+      }
+      if (errors.length > 0) {
         return {
           behavior: "block",
-          reason: "Company name is required",
+          reason: "Missing Required Information",
           perform: (result) => {
             if (result.behavior === "block") {
-              setValidationError("Enter your company name");
+              setValidationError(errors.join("\n"));
             }
           }
         };
@@ -19584,23 +19578,10 @@ ${errorInfo.componentStack}`);
         }
       };
     });
-    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-      TextField2,
-      {
-        type: "text",
-        label: "Company Name",
-        value: shippingAddress.company,
-        required: canBlockProgress,
-        onInput: () => setValidationError(""),
-        onChange: (name) => {
-          changeShippingAddress({
-            type: "updateShippingAddress",
-            address: { company: name }
-          });
-        },
-        error: validationError
-      }
-    );
+    (0, import_react12.useEffect)(() => {
+      setValidationError("");
+    }, [shippingAddress.phone, shippingAddress.company]);
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_jsx_runtime4.Fragment, { children: validationError && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Banner2, { title: "Missing Required Information", status: "critical", children: `The following information needs to be entered: ${validationError}` }) });
   }
 })();
 //# sourceMappingURL=lk-checkout-ui.js.map
